@@ -2,7 +2,6 @@
   "IsEncrypted": false,
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "python",
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "ANTHROPIC_API_KEY": "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"
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true"
   }
 }

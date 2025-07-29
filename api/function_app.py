@@ -198,7 +198,9 @@ RULES:
 
 # Initialize the client
 
-client = AnthropicClient(ANTHROPIC_API_KEY)
+client = None
+if ANTHROPIC_API_KEY:
+    client = AnthropicClient(ANTHROPIC_API_KEY)
 
 @app.route(route="test", auth_level=func.AuthLevel.ANONYMOUS)
 def test(req: func.HttpRequest) -> func.HttpResponse:
