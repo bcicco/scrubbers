@@ -7,8 +7,6 @@ from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 import time
 from anthropic import Anthropic
-from dotenv import load_dotenv
-load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
