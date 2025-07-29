@@ -14,8 +14,7 @@ logger = logging.getLogger(__name__)
 app = func.FunctionApp()
 
 # Get API key from environment variables
-super_cool_string = "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"
-ANTHROPIC_API_KEY = super_cool_string
+ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 @dataclass
 class BusinessLead:
     """Data class to represent a business lead"""
@@ -198,9 +197,8 @@ RULES:
             return []
 
 # Initialize the client
-client = None
-if ANTHROPIC_API_KEY:
-    client = AnthropicClient(ANTHROPIC_API_KEY)
+
+client = AnthropicClient(ANTHROPIC_API_KEY)
 
 @app.route(route="test", auth_level=func.AuthLevel.ANONYMOUS)
 def test(req: func.HttpRequest) -> func.HttpResponse:
