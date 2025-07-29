@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 app = func.FunctionApp()
 
 # Get API key from environment variables
-ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 @dataclass
 class BusinessLead:
     """Data class to represent a business lead"""
