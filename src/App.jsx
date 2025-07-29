@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { LeadGenProvider } from './contexts/LeadGenContext';
 import ProductForm from './components/ProductForm';
 import GeographicalSelection from './components/GeographicalSelection';
+import LeadGeneration from './components/LeadGeneration';
 import './App.css';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Routes>
             <Route path="/" element={<ProductForm />} />
             <Route path="select-areas" element={<GeographicalSelection />} />
+            <Route path="processing" element={<LeadGeneration />} />
           </Routes>
         </main>
       </div>
