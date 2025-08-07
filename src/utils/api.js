@@ -1,7 +1,8 @@
 // API client for Azure Function backend
-export const generateLeadsForArea = async (productDescription, targetIndustry, area) => {
+export const generateLeadsForArea = async (productDescription, targetIndustry, area, productName) => {
   try {
     // Extract product name from description (first few words)
+    
     
     const url = `/api/get_business_leads_openai?${new URLSearchParams({
       locality: area,
