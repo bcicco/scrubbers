@@ -11,6 +11,8 @@ const LeadGeneration = () => {
   const [completedAreas, setCompletedAreas] = useState([]);
   const [errors, setErrors] = useState([]);
 
+  
+
   useEffect(() => {
     const processAreas = async () => {
       if (sessionData.selectedAreas.length === 0) {
@@ -67,7 +69,9 @@ const LeadGeneration = () => {
       <h1>Generating Business Leads</h1>
       
       <div className="progress-info">
-        <p><strong>Product:</strong> {sessionData.productDescription}</p>
+        <p><strong>CustomerID:</strong> {sessionData.customerID}</p>
+        <p><strong>Product Name:</strong>{sessionData.produtName}</p>
+        <p><strong>Description:</strong> {sessionData.productDescription}</p>
         <p><strong>Industry:</strong> {sessionData.targetIndustry}</p>
         <p><strong>Total Areas:</strong> {sessionData.selectedAreas.length}</p>
       </div>
