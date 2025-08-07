@@ -5,6 +5,7 @@ const LeadGenContext = createContext();
 export const LeadGenProvider = ({ children }) => {
   const [sessionData, setSessionData] = useState({
     sessionId: null,
+    customerID: '',
     productName: '',
     productDescription: '',
     targetIndustry: '',
@@ -30,6 +31,13 @@ export const LeadGenProvider = ({ children }) => {
       ...prev,
       selectedAreas: areas,
       currentStep: 3
+    }));
+  };
+
+  const updateCustomerID = (customerID) => {
+    setSessionData(prev = ({
+      ...prev,
+      customerID: customerID
     }));
   };
 

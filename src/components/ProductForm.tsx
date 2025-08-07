@@ -9,6 +9,7 @@ const ProductForm = () => {
   const [productDesc, setProductDesc] = useState(sessionData.productDescription);
   const [industry, setIndustry] = useState(sessionData.targetIndustry);
   const [productName, setName] = useState(sessionData.productName)
+  const [customerID, setCustomerID] = useState(sessionData.customerID)
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,6 +41,18 @@ const ProductForm = () => {
             value={productDesc}
             onChange={(e) => setProductDesc(e.target.value)}
             placeholder="Describe your product or service..."
+            rows={4}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="customerID">customerID:</label>
+          <textarea
+            id="CustomerID"
+            value={customerID}
+            onChange={(e) => setCustomerID(e.target.value)}
+            placeholder="Enter customer ID"
             rows={4}
             required
           />
