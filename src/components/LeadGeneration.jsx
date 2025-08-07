@@ -70,7 +70,7 @@ const LeadGeneration = () => {
       
       <div className="progress-info">
         <p><strong>CustomerID:</strong> {sessionData.customerID}</p>
-        <p><strong>Product Name:</strong>{sessionData.produtName}</p>
+        <p><strong>Product Name:</strong>{sessionData.productName}</p>
         <p><strong>Description:</strong> {sessionData.productDescription}</p>
         <p><strong>Industry:</strong> {sessionData.targetIndustry}</p>
         <p><strong>Total Areas:</strong> {sessionData.selectedAreas.length}</p>

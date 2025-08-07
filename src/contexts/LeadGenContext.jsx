@@ -36,7 +36,7 @@ export const LeadGenProvider = ({ children }) => {
   };
 
   const updateCustomerID = (customerID) => {
-    setSessionData(prev = ({
+    setSessionData(prev => ({
       ...prev,
       customerID: customerID
     }));
