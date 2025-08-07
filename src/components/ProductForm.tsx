@@ -14,7 +14,7 @@ const ProductForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (productDesc.trim() && industry.trim() && productName.trim()) {
-      updateProduct(productName, productDesc, industry);
+      updateProduct(customerID, productName, productDesc, industry);
       navigate('/select-areas');
     }
   };

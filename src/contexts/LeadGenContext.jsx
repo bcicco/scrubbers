@@ -16,9 +16,10 @@ export const LeadGenProvider = ({ children }) => {
     currentArea: ''
   });
 
-  const updateProduct = (name, description ,industry) => {
+  const updateProduct = (customerID, name, description ,industry) => {
     setSessionData(prev => ({
       ...prev,
+      customerID: customerID, 
       productName: name,
       productDescription: description,
       targetIndustry: industry,
