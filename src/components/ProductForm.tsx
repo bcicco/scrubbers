@@ -6,13 +6,14 @@ const ProductForm = () => {
   const { sessionData, updateProduct } = useLeadGen();
   const navigate = useNavigate();
   
-  const [product, setProduct] = useState(sessionData.productDescription);
+  const [productDesc, setProduct] = useState(sessionData.productDescription);
   const [industry, setIndustry] = useState(sessionData.targetIndustry);
+  const [productName, setName] = useState(sessionData.prodctName)
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (product.trim() && industry.trim()) {
-      updateProduct(product, industry);
+    if (productDesc.trim() && industry.trim() && productName.trim()) {
+      updateProduct(productName, productDesc, industry);
       navigate('/select-areas');
     }
   };
@@ -22,16 +23,28 @@ const ProductForm = () => {
       <h1>Describe Your Product</h1>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="product">Product Description:</label>
+          <label htmlFor="product">Product:</label>
           <textarea
             id="product"
-            value={product}
+            value={productName}
+            onChange={(e) => setProduct(e.target.value)}
+            placeholder="Product Name"
+            rows={4}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="product">Product Description:</label>
+          <textarea
+            id="product-description"
+            value={productDesc}
             onChange={(e) => setProduct(e.target.value)}
             placeholder="Describe your product or service..."
             rows={4}
             required
           />
         </div>
+
         
         <div className="form-group">
           <label htmlFor="industry">Target Industry:</label>
