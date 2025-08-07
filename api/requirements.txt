@@ -5,3 +5,4 @@
 azure-functions
 anthropic
 python-dotenv
+openai

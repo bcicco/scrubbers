@@ -4,7 +4,7 @@ export const generateLeadsForArea = async (productDescription, targetIndustry, a
     // Extract product name from description (first few words)
     const productName = productDescription.split(' ').slice(0, 3).join(' ');
     
-    const url = `/api/get_business_leads?${new URLSearchParams({
+    const url = `/api/get_business_leads_openai?${new URLSearchParams({
       locality: area,
       product: productName,
       product_description: productDescription,

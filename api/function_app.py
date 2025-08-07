@@ -7,6 +7,7 @@ from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 import time
 from anthropic import Anthropic
+from openai import Openai
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,6 +16,7 @@ app = func.FunctionApp()
 
 # Get API key from environment variables
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 @dataclass
 class BusinessLead:
     """Data class to represent a business lead"""
@@ -196,7 +198,73 @@ RULES:
             logger.error(f"Error finding businesses: {e}")
             return []
 
-# Initialize the client
+class OpenAIClient:
+    def __init__(self, api_key: str):
+        self.client = OpenAI(api_key=api_key)
+
+    def _make_request(self, prompt: str) -> str:
+        try:
+            response = self.client.responses.create(
+                model="gpt-4o",
+                input=prompt,
+                tools=[{"type": "web_search_preview", "search_context_size": "medium"}]
+            )
+            return response.output[-1].content[0].text
+        except Exception as e:
+            logger.error(f"OpenAI Responses API request failed: {e}")
+            raise
+
+    def find_businesses(
+        self,
+        product: str,
+        product_description: str,
+        target_industry: str,
+        location: str = "",
+        business_size: str = "small to medium",
+        num_businesses: int = 10
+    ) -> List[BusinessLead]:
+
+        location_filter = f"must have a shop in {location}" if location else ""
+
+        prompt = f"""
+Find {num_businesses} businesses that are not purely online, {location_filter} in the {target_industry} industry 
+that would likely be interested in purchasing {product} from me. Ideally they will not already stock my product.
+Here is a description of {product}: {product_description}
+
+RESPOND WITH ONLY THIS JSON FORMAT (no other text):
+{{
+    "businesses": [
+        {{
+            "name": "Actual Business Name Found Via Search",
+            "industry": "Industry/sector",
+            "contact_email": "email",
+            "location": "City, State/Country",
+            "website": "https://actualwebsite.com",
+            "phone": "+61xxxxxxxxx",
+            "description": "Brief description",
+            "size": "small/medium"
+        }}
+    ]
+}}
+
+Make sure to ground your info using web search and include verified email addresses.
+"""
+        try:
+            raw_output = self._make_request(prompt)
+            business_data = json.loads(raw_output)
+            businesses = [
+                BusinessLead(**biz) for biz in business_data.get("businesses", [])
+            ]
+            logger.info(f"Found {len(businesses)} businesses (OpenAI)")
+            return businesses
+
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON parse error: {e}\nOutput was:\n{raw_output}")
+            return []
+        except Exception as e:
+            logger.error(f"Error during business search (OpenAI): {e}")
+            return []
+
 
 client = None
 if ANTHROPIC_API_KEY:
@@ -295,6 +363,75 @@ def get_business_leads(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({
                 "error": "Internal server error", 
+                "message": str(e)
+            }),
+            status_code=500,
+            mimetype="application/json"
+        )
+@app.route(route="get_business_leads_openai", auth_level=func.AuthLevel.ANONYMOUS)
+def get_business_leads_openai(req: func.HttpRequest) -> func.HttpResponse:
+    """GET route to generate leads using OpenAI"""
+    openai_client = OpenAIClient(OPENAI_API_KEY)
+    try:
+        logger.info("OpenAI business leads GET triggered")
+
+        if not openai_client:
+            return func.HttpResponse(
+                json.dumps({"error": "OpenAI API key not configured"}),
+                status_code=500,
+                mimetype="application/json"
+            )
+
+        # Extract query parameters
+        locality = req.params.get('locality')
+        product = req.params.get('product')
+        product_description = req.params.get('product_description')
+        target_industry = req.params.get('target_industry')
+
+        # Check for missing fields
+        missing = []
+        if not locality: missing.append("locality")
+        if not product: missing.append("product")
+        if not product_description: missing.append("product_description")
+        if not target_industry: missing.append("target_industry")
+
+        if missing:
+            return func.HttpResponse(
+                json.dumps({
+                    "error": "Missing required query parameters",
+                    "missing": missing
+                }),
+                status_code=400,
+                mimetype="application/json"
+            )
+
+        # Get leads
+        businesses = openai_client.find_businesses(
+            product, product_description, target_industry, locality
+        )
+
+        result = {
+            "businesses": [b.to_dict() for b in businesses],
+            "meta": {
+                "product": product,
+                "location": locality,
+                "industry": target_industry,
+                "count": len(businesses),
+                "generated_at": datetime.datetime.utcnow().isoformat()
+            }
+        }
+
+        return func.HttpResponse(
+            json.dumps(result),
+            status_code=200,
+            mimetype="application/json"
+        )
+
+    except Exception as e:
+        logger.error(f"Unexpected error in OpenAI business leads: {e}")
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Internal server error",
                 "message": str(e)
             }),
             status_code=500,
