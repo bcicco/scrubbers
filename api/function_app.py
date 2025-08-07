@@ -17,6 +17,7 @@ app = func.FunctionApp()
 # Get API key from environment variables
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+print("OPENAI API KEY:", OPENAI_API_KEY)
 @dataclass
 class BusinessLead:
     """Data class to represent a business lead"""
