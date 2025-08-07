@@ -18,7 +18,7 @@ export const LeadGenProvider = ({ children }) => {
   const updateProduct = (name, description ,industry) => {
     setSessionData(prev => ({
       ...prev,
-      productDescription: name,
+      productName: name,
       productDescription: description,
       targetIndustry: industry,
       currentStep: 2

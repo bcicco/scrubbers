@@ -6,9 +6,9 @@ const ProductForm = () => {
   const { sessionData, updateProduct } = useLeadGen();
   const navigate = useNavigate();
   
-  const [productDesc, setProduct] = useState(sessionData.productDescription);
+  const [productDesc, setProductDesc] = useState(sessionData.productDescription);
   const [industry, setIndustry] = useState(sessionData.targetIndustry);
-  const [productName, setName] = useState(sessionData.prodctName)
+  const [productName, setName] = useState(sessionData.productName)
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -27,7 +27,7 @@ const ProductForm = () => {
           <textarea
             id="product"
             value={productName}
-            onChange={(e) => setProduct(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             placeholder="Product Name"
             rows={4}
             required
@@ -38,7 +38,7 @@ const ProductForm = () => {
           <textarea
             id="product-description"
             value={productDesc}
-            onChange={(e) => setProduct(e.target.value)}
+            onChange={(e) => setProductDesc(e.target.value)}
             placeholder="Describe your product or service..."
             rows={4}
             required
