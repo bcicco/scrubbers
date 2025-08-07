@@ -8,7 +8,7 @@ const ProductForm = () => {
   
   const [productDesc, setProductDesc] = useState(sessionData.productDescription);
   const [industry, setIndustry] = useState(sessionData.targetIndustry);
-  const [productName, setName] = useState(sessionData.productName)
+  const [productName, setProductName] = useState(sessionData.productName)
   const [customerID, setCustomerID] = useState(sessionData.customerID)
 
   const handleSubmit = (e) => {
@@ -24,11 +24,11 @@ const ProductForm = () => {
       <h1>Describe Your Product</h1>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="product">Product:</label>
+          <label htmlFor="productName">Product:</label>
           <textarea
-            id="product"
+            id="productName"
             value={productName}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => setProductName(e.target.value)}
             placeholder="Product Name"
             rows={4}
             required
