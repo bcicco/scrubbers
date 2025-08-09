@@ -33,7 +33,8 @@ const LeadGeneration = () => {
           const leads = await generateLeadsForArea(
             sessionData.productDescription,
             sessionData.targetIndustry,
-            area
+            area,
+            sessionData.productName
           );
           
           updateLeadResults(area, leads);
