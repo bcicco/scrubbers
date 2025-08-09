@@ -8,9 +8,11 @@ from dataclasses import dataclass
 import time
 from anthropic import Anthropic
 from openai import OpenAI
+from dotenv import load_dotenv
+from pydantic import BaseModel
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+load_dotenv() #only for dev
+
 
 app = func.FunctionApp()
 
@@ -29,6 +31,19 @@ class BusinessLead:
     description: Optional[str] = None
     size: Optional[str] = None
     website: Optional[str] = None
+
+class Business(BaseModel):
+    name: str
+    industry: str
+    contact_email: str
+    location: Optional[str] = None
+    phone: Optional[str] = None
+    description: Optional[str] = None
+    size: Optional[str] = None
+    website: Optional[str] = None
+
+class Businesses(BaseModel):
+    business_leads: List[Business]
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization"""
@@ -98,7 +113,7 @@ class AnthropicClient:
                 return response.content[-1].text
             
         except Exception as e:
-            logger.error(f"Anthropic API request failed: {e}")
+            print(f"Anthropic API request failed: {e}")
             raise
     
     def find_businesses(self, 
@@ -188,15 +203,15 @@ RULES:
                     size=biz.get('size')
                 ))
             
-            logger.info(f"Successfully found {len(businesses)} businesses")
+            print(f"Successfully found {len(businesses)} businesses")
             return businesses
             
         except json.JSONDecodeError as e:
-            logger.error(f"Error parsing JSON response: {e}")
-            logger.error(f"Response content: {response_content}")
+            print(f"Error parsing JSON response: {e}")
+            print(f"Response content: {response_content}")
             return []
         except Exception as e:
-            logger.error(f"Error finding businesses: {e}")
+            print(f"Error finding businesses: {e}")
             return []
 
 class OpenAIClient:
@@ -205,14 +220,32 @@ class OpenAIClient:
 
     def _make_request(self, prompt: str) -> str:
         try:
-            response = self.client.responses.create(
+            response = self.client.responses.parse(
                 model="gpt-4o",
                 input=prompt,
-                tools=[{"type": "web_search_preview", "search_context_size": "medium"}]
+                tools=[{"type": "web_search_preview", "search_context_size": "medium"}],
+                text_format=Businesses
             )
-            return response.output[-1].content[0].text
+            '''
+            usage = response.usage
+            prompt_tokens = usage.prompt_tokens
+            completion_tokens = usage.completion_tokens
+            total_tokens = usage.total_tokens
+            '''
+            print(response.usage)
+            print(type(response.usage))
+            print(response.usage.input_tokens)
+            print(response.usage.output_tokens)
+
+           
+            token_details = {
+                "prompt_tokens": 12,
+                "completion_tokens": 12,
+                "total_tokens": 12
+            }
+            return response.output_parsed, token_details
         except Exception as e:
-            logger.error(f"OpenAI Responses API request failed: {e}")
+            print(f"OpenAI Responses API request failed: {e}")
             raise
 
     def find_businesses(
@@ -223,47 +256,24 @@ class OpenAIClient:
         location: str = "",
         business_size: str = "small to medium",
         num_businesses: int = 10
-    ) -> List[BusinessLead]:
+    ) -> Businesses:
 
         location_filter = f"must have a shop in {location}" if location else ""
 
         prompt = f"""
-Find {num_businesses} businesses that are not purely online, {location_filter} in the {target_industry} industry 
+Using only 3 search queries, find {num_businesses} businesses that are not purely online, {location_filter} in the {target_industry} industry 
 that would likely be interested in purchasing {product} from me. Ideally they will not already stock my product.
 Here is a description of {product}: {product_description}
 
-RESPOND WITH ONLY THIS JSON FORMAT (no other text):
-{{
-    "businesses": [
-        {{
-            "name": "Actual Business Name Found Via Search",
-            "industry": "Industry/sector",
-            "contact_email": "email",
-            "location": "City, State/Country",
-            "website": "https://actualwebsite.com",
-            "phone": "+61xxxxxxxxx",
-            "description": "Brief description",
-            "size": "small/medium"
-        }}
-    ]
-}}
+
 
 Make sure to ground your info using web search and include verified email addresses.
 """
         try:
-            raw_output = self._make_request(prompt)
-            business_data = json.loads(raw_output)
-            businesses = [
-                BusinessLead(**biz) for biz in business_data.get("businesses", [])
-            ]
-            logger.info(f"Found {len(businesses)} businesses (OpenAI)")
-            return businesses
-
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON parse error: {e}\nOutput was:\n{raw_output}")
-            return []
+            businesses, token_details = self._make_request(prompt)
+            return businesses, token_details
         except Exception as e:
-            logger.error(f"Error during business search (OpenAI): {e}")
+            print(f"Error during business search (OpenAI): {e}")
             return []
 
 
@@ -374,7 +384,7 @@ def get_business_leads_openai(req: func.HttpRequest) -> func.HttpResponse:
     """GET route to generate leads using OpenAI"""
     openai_client = OpenAIClient(OPENAI_API_KEY)
     try:
-        logger.info("OpenAI business leads GET triggered")
+        print("OpenAI business leads GET triggered")
 
         if not openai_client:
             return func.HttpResponse(
@@ -407,18 +417,19 @@ def get_business_leads_openai(req: func.HttpRequest) -> func.HttpResponse:
             )
 
         # Get leads
-        businesses = openai_client.find_businesses(
+        businesses, token_details = openai_client.find_businesses(
             product, product_description, target_industry, locality
         )
 
         result = {
-            "businesses": [b.to_dict() for b in businesses],
+            "businesses": [b.model_dump() for b in businesses.business_leads],
             "meta": {
                 "product": product,
                 "location": locality,
                 "industry": target_industry,
-                "count": len(businesses),
-                "generated_at": datetime.datetime.utcnow().isoformat()
+                "count": len(businesses.business_leads),
+                "generated_at": datetime.datetime.utcnow().isoformat(),
+                "token_details": token_details
             }
         }
 
@@ -429,7 +440,7 @@ def get_business_leads_openai(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     except Exception as e:
-        logger.error(f"Unexpected error in OpenAI business leads: {e}")
+        print(f"Unexpected error in OpenAI business leads: {e}")
         return func.HttpResponse(
             json.dumps({
                 "error": "Internal server error",
