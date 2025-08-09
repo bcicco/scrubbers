@@ -11,7 +11,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from pydantic import BaseModel
 
-load_dotenv() #only for dev
+#load_dotenv() 
 
 
 app = func.FunctionApp()
