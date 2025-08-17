@@ -13,7 +13,7 @@ from pydantic import BaseModel
 import pyodbc
 
 '''Uncomment for Local Dev'''
-load_dotenv() 
+#load_dotenv() 
 
 
 app = func.FunctionApp()
