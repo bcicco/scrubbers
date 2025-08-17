@@ -10,12 +10,19 @@ from anthropic import Anthropic
 from openai import OpenAI
 from dotenv import load_dotenv
 from pydantic import BaseModel
+import pyodbc
 
-#load_dotenv() 
+'''Uncomment for Local Dev'''
+load_dotenv() 
 
 
 app = func.FunctionApp()
 
+server = 'scrubbresdbserver.database.windows.net'
+database = 'scrubbersdb'
+username = 'bcicco'
+password = 'Chinaroll1!'
+driver = '{ODBC Driver 17 for SQL Server}'
 # Get API key from environment variables
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -42,21 +49,39 @@ class Business(BaseModel):
     size: Optional[str] = None
     website: Optional[str] = None
 
+    
 class Businesses(BaseModel):
     business_leads: List[Business]
+def push_to_db(businesses: Businesses, customer_id, target_area):
+    print("printing first business: ")
+    print(businesses.business_leads[0])
+    conn = pyodbc.connect(
+    f'DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+    )
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary for JSON serialization"""
-        return {
-            'name': self.name,
-            'industry': self.industry,
-            'location': self.location,
-            'website': self.website,
-            'contact_email': self.contact_email,
-            'phone': self.phone,
-            'description': self.description,
-            'size': self.size
-        }
+    cursor = conn.cursor()
+
+
+    # Push data
+    for biz in businesses.business_leads:
+        print("Business: ", biz)
+        cursor.execute("""
+            INSERT INTO BusinessLeads
+            (customerID, targetArea, businessName, businessIndustry, contactEmail, location, phoneNumber, description, size, website)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            customer_id,
+            target_area,  # optional field
+            biz.name,
+            biz.industry,
+            biz.contact_email,
+            getattr(biz, "location", None),
+            getattr(biz, "phone", None),
+            getattr(biz, "description", None),
+            getattr(biz, "size", None),
+            getattr(biz, "website", None)
+        ))
+    conn.commit()
 
 class AnthropicClient:
     """Client for interacting with Anthropic API to find business leads"""
@@ -321,6 +346,7 @@ def get_business_leads(req: func.HttpRequest) -> func.HttpResponse:
         locality = req.params.get('locality')
         product = req.params.get('product') 
         product_description = req.params.get('product_description')
+        customer_id = req.params.get('customer_id')
         target_industry = req.params.get('target_industry')
         
         # Validate required parameters
@@ -350,6 +376,7 @@ def get_business_leads(req: func.HttpRequest) -> func.HttpResponse:
             target_industry=target_industry,
             location=locality
         )
+        push_to_db(businesses, customer_id, locality)
         
         # Return the results
         result = {
@@ -396,6 +423,7 @@ def get_business_leads_openai(req: func.HttpRequest) -> func.HttpResponse:
         # Extract query parameters
         locality = req.params.get('locality')
         product = req.params.get('product')
+        customer_id = req.params.get('customer_id')
         product_description = req.params.get('product_description')
         target_industry = req.params.get('target_industry')
 
@@ -420,6 +448,7 @@ def get_business_leads_openai(req: func.HttpRequest) -> func.HttpResponse:
         businesses, token_details = openai_client.find_businesses(
             product, product_description, target_industry, locality
         )
+        push_to_db(businesses, customer_id, locality)
 
         result = {
             "businesses": [b.model_dump() for b in businesses.business_leads],
@@ -449,3 +478,85 @@ def get_business_leads_openai(req: func.HttpRequest) -> func.HttpResponse:
             status_code=500,
             mimetype="application/json"
         )
+    
+@app.route(route="create_leads_table", auth_level=func.AuthLevel.ANONYMOUS)
+def SQLtest(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
+    conn = pyodbc.connect(
+    f'DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+    )
+
+    cursor = conn.cursor()
+
+    # Create table
+    cursor.execute("""
+    CREATE TABLE BusinessLeads (
+        leadID INT IDENTITY(1,1) PRIMARY KEY,
+        customerID INT NOT NULL,
+        targetArea NVARCHAR(255) NOT NULL,
+        businessName NVARCHAR(255) NOT NULL,
+        businessIndustry NVARCHAR(255) NOT NULL,
+        contactEmail NVARCHAR(255) NOT NULL,
+        location NVARCHAR(255) NULL,
+        phoneNumber NVARCHAR(50) NULL,
+        description NVARCHAR(MAX) NULL,
+        size NVARCHAR(50) NULL,
+        website NVARCHAR(255) NULL
+    );
+    """)
+
+    conn.commit()
+    print("Table created successfully")
+
+    cursor.close()
+    return func.HttpResponse(
+            "This HTTP triggered function executed successfully",
+            status_code=200
+    )
+
+@app.route(route="push_business_leads", auth_level=func.AuthLevel.ANONYMOUS)
+def push_leads(req: func.HttpRequest) -> func.HttpResponse:
+    openAiResponse = req.params.get('businesses')
+    customer_id = req.params.get('customer_id'),
+    target_area = req.params.get('target_area')
+    conn = pyodbc.connect(
+    f'DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+    )
+
+    cursor = conn.cursor()
+
+
+    # Push data
+    for biz in openAiResponse["businesses"]:
+   
+        cursor.execute("""
+            INSERT INTO BusinessLeads 
+            (customerID, targetArea, businessName, businessIndustry, contactEmail, location, phoneNumber, description, size, website)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            customer_id,
+            target_area,
+            biz.name,
+            biz.industry,
+            biz.contact_email,
+            biz.location,
+            biz.phone,
+            biz.description,
+            biz.size,
+            biz.website
+        ))
+
+    conn.commit()
+    cursor.close()
+    print(" Inserted {len(businesses)} business leads")
+
+    conn.commit()
+    print("Table created successfully")
+
+    cursor.close()
+    return func.HttpResponse(
+            "This HTTP triggered function executed successfully",
+            status_code=200
+    )
+    
+

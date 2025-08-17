@@ -8,14 +8,18 @@ const ProductForm = () => {
   
   const [productDesc, setProductDesc] = useState(sessionData.productDescription);
   const [industry, setIndustry] = useState(sessionData.targetIndustry);
-  const [productName, setProductName] = useState(sessionData.productName)
-  const [customerID, setCustomerID] = useState(sessionData.customerID)
+  const [productName, setProductName] = useState(sessionData.productName);
+  const [customerID, setCustomerID] = useState(sessionData.customerID);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (productDesc.trim() && industry.trim() && productName.trim()) {
+    
+    // Check if all required fields are filled, including customerID
+    if (productDesc.trim() && industry.trim() && productName.trim() && customerID.trim()) {
       updateProduct(customerID, productName, productDesc, industry);
       navigate('/select-areas');
+    } else {
+      alert('Please fill in all required fields');
     }
   };
 
@@ -34,8 +38,9 @@ const ProductForm = () => {
             required
           />
         </div>
+        
         <div className="form-group">
-          <label htmlFor="product">Product Description:</label>
+          <label htmlFor="product-description">Product Description:</label>
           <textarea
             id="product-description"
             value={productDesc}
@@ -45,19 +50,18 @@ const ProductForm = () => {
             required
           />
         </div>
-
+        
         <div className="form-group">
-          <label htmlFor="customerID">customerID:</label>
-          <textarea
-            id="CustomerID"
+          <label htmlFor="customerID">Customer ID:</label>
+          <input
+            id="customerID"
+            type="text"
             value={customerID}
             onChange={(e) => setCustomerID(e.target.value)}
             placeholder="Enter customer ID"
-            rows={4}
             required
           />
         </div>
-
         
         <div className="form-group">
           <label htmlFor="industry">Target Industry:</label>
