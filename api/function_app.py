@@ -292,7 +292,7 @@ Here is a description of {product}: {product_description}
 
 
 
-Make sure to ground your info using web search and include verified email addresses. Note that {location} is in Australia.
+Make sure to ground your info using web search and only include businesses with verified email addresses. Note that {location} is in Australia.
 """
         try:
             businesses, token_details = self._make_request(prompt)
