@@ -246,7 +246,7 @@ class OpenAIClient:
     def _make_request(self, prompt: str) -> str:
         try:
             response = self.client.responses.parse(
-                model="gpt-5",
+                model="gpt-4o",
                 input=prompt,
                 tools=[{"type": "web_search_preview", "search_context_size": "medium"}],
                 text_format=Businesses
