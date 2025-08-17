@@ -248,7 +248,7 @@ class OpenAIClient:
             response = self.client.responses.parse(
                 model="gpt-4o",
                 input=prompt,
-                tools=[{"type": "web_search_preview", "search_context_size": "medium"}],
+                tools=[{"type": "web_search_preview", "search_context_size": "high"}],
                 text_format=Businesses
             )
             '''
