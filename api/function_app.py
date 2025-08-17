@@ -286,7 +286,7 @@ class OpenAIClient:
         location_filter = f"must have a shop in {location}" if location else ""
 
         prompt = f"""
-Using only 3 search queries, find {num_businesses} businesses that are not purely online, {location_filter} in the {target_industry} industry 
+Find {num_businesses} businesses that are not purely online, {location_filter} in the {target_industry} industry 
 that would likely be interested in purchasing {product} from me. Ideally they will not already stock my product.
 Here is a description of {product}: {product_description}
 
