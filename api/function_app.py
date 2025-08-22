@@ -246,7 +246,7 @@ class OpenAIClient:
     def _make_request(self, prompt: str) -> str:
         try:
             response = self.client.responses.parse(
-                model="gpt-4o",
+                model="gpt-5-mini",
                 input=prompt,
                 tools=[{"type": "web_search_preview", "search_context_size": "high"}],
                 text_format=Businesses
@@ -292,7 +292,7 @@ Here is a description of {product}: {product_description}
 
 
 
-Make sure to ground your info using web search and only include businesses with verified email addresses. If you do not explicitly find the email address, fill in the email field with: Not available. Note that {location} is in Australia.
+Make sure to ground your info using web search and only include businesses with email addresses. If you do not explicitly find the email address, fill in the email field with: Not available. Note that {location} is in Australia.
 """
         try:
             businesses, token_details = self._make_request(prompt)
