@@ -1,21 +1,8 @@
 
 from openai import OpenAI
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-
-class Business(BaseModel):
-    name: str
-    industry: str
-    contact_email: str
-    location: Optional[str] = None
-    phone: Optional[str] = None
-    description: Optional[str] = None
-    size: Optional[str] = None
-    website: Optional[str] = None
-
-    
-class Businesses(BaseModel):
-    business_leads: List[Business]
+from typing import List, Optional
+from utils.businesses import Businesses
 
 
 class OpenAIClient:

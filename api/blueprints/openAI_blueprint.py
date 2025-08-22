@@ -1,12 +1,4 @@
-# Register this blueprint by adding the following line of code 
-# to your entry point file.  
-# app.register_functions(openAI) 
-# 
-# Please refer to https://aka.ms/azure-functions-python-blueprints
-
-
 import azure.functions as func
-import logging
 from utils.database.push_leads_to_db import push_to_db
 import os
 import json

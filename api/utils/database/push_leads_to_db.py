@@ -1,4 +1,4 @@
-from ..pydantic_classes.businesses import Businesses
+from ..businesses import Businesses
 import pyodbc
 from typing import List
 def push_to_db(businesses: Businesses, customer_id, target_area, server_creds: List[str]):
