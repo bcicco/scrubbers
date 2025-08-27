@@ -2,6 +2,8 @@ import azure.functions as func
 import logging
 import smtplib
 from email.mime.text import MIMEText
+import imaplib  # Lets Python talk to IMAP servers using the protocol
+import email    # Allows the emails to be read
 import json
 
 mailBP = func.Blueprint()
@@ -50,3 +52,72 @@ def send_mail(req: func.HttpRequest) -> func.HttpResponse:
     except Exception as e:
         return func.HttpResponse(f"Internal server error, error: {e}")
     return func.HttpResponse(f"Message to {contact_email} sent successfully")
+
+@mailBP.route(route="read_mail", auth_level=func.AuthLevel.ANONYMOUS)
+def read_mail(req: func.HttpRequest) -> func.HttpResponse:
+    """Reads UNREAD emails, emails opting out by replying "STOP" need to be actioned 
+    to be put into a database not to contct. All other emails are forwarded on 
+    to forward_email
+    
+    outputs:
+        - success / failure http response"""
+    
+logging.info("Python HTTP trigger function processed a request.")
+
+# Gmail IMAP server details
+IMAP_SERVER = "imap.gmail.com"  # Connect to Gmail's IMAP server
+EMAIL_ACCOUNT = "percy@randallsstore.com.au"
+APP_PASSWORD = "tfaf libd uqws rtwv"  # 16-char app password, not your normal password
+
+# Function to extract body text from an email
+def get_body(msg):
+    if msg.is_multipart():
+        for part in msg.walk():
+            if part.get_content_type() == "text/plain":
+                return part.get_payload(decode=True).decode(errors="ignore")
+    else:
+        return msg.get_payload(decode=True).decode(errors="ignore")
+
+# Connect to IMAP Server and log in
+mail = imaplib.IMAP4_SSL(IMAP_SERVER)
+mail.login(EMAIL_ACCOUNT, APP_PASSWORD)
+
+mail.select("inbox")
+
+# Search for unread emails
+status, data = mail.search(None, "UNSEEN")
+mail_ids = data[0].split()
+
+# Loop through unread emails
+for num in mail_ids:
+    status, data = mail.fetch(num, "(RFC822)")
+    raw_email = data[0][1]
+    msg = email.message_from_bytes(raw_email)
+
+    # Extract the body
+    body = get_body(msg)
+
+    print("From:", msg["From"])
+    print("Subject:", msg["Subject"])
+    print("Body:", body)
+
+    # Check for STOP keyword
+    if "STOP" in body.upper():
+        print("Found STOP — add to Global Do Not Mail list")
+
+        #CODE to actually do this needs to be added. 
+
+    else:
+        print("Forwarding email to personal inbox...")
+
+        # Build a simple forwarded message
+        fwd_msg = MIMEText(body)
+        fwd_msg["Subject"] = "FWD: " + (msg["Subject"] or "")
+        fwd_msg["From"] = EMAIL_ACCOUNT
+        fwd_msg["To"] = "percevalrandall@gmail.com"   # 👈 replace with your real personal address
+
+        # Send it via Gmail SMTP
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(EMAIL_ACCOUNT, APP_PASSWORD)
+            smtp.send_message(fwd_msg)
+
