@@ -31,12 +31,14 @@ const LeadGeneration = () => {
         setCurrentArea(area);
 
         try {
+          console.log("Trying to get business Leads")
           const url = `/api/get_business_leads_openai?${new URLSearchParams({
             locality: area,
             product: sessionData.productName,
             product_description: sessionData.productDescription,
             customer_id: sessionData.customerID,
             target_industry: sessionData.targetIndustry,
+            product_id: sessionData.productId
           })}`;
 
           const response = await fetch(url);
