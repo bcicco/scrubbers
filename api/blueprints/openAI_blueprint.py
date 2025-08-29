@@ -1,5 +1,5 @@
 import azure.functions as func
-from utils.database.push_leads_to_db import push_to_db
+from utils.database.leads_table import insert_leads
 import os
 import json
 from utils.openAI import OpenAIClient
@@ -11,6 +11,7 @@ openAIBP = func.Blueprint()
 @openAIBP.route(route="get_business_leads_openai", auth_level=func.AuthLevel.ANONYMOUS)
 def get_business_leads_openai(req: func.HttpRequest) -> func.HttpResponse:
     """GET route to generate leads using OpenAI"""
+    print("Got to function")
 
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
     server_creds = [
@@ -38,7 +39,7 @@ def get_business_leads_openai(req: func.HttpRequest) -> func.HttpResponse:
         customer_id = req.params.get("customer_id")
         product_description = req.params.get("product_description")
         target_industry = req.params.get("target_industry")
-
+        product_id = req.params.get("product_id")
         # debuggin --> checks for missing params, probably a better way to do this
         missing = []
         if not locality:
@@ -63,8 +64,8 @@ def get_business_leads_openai(req: func.HttpRequest) -> func.HttpResponse:
         businesses, token_details = openai_client.find_businesses(
             product, product_description, target_industry, locality
         )
-        push_to_db(businesses, customer_id, locality, server_creds)
-
+        
+        insert_leads(businesses, locality, server_creds, product_id)
         return func.HttpResponse(
             "Open AI business leads obtained + pushed successfully",
             status_code=200,

@@ -149,9 +149,44 @@ const GeographicalSelection = () => {
     });
   };
 
-  const handleSubmit = () => {
-    const sa2Areas = getSA2Areas();
-    const areaNames = sa2Areas.map(area => area.name);
+  const handleSubmit = async () => {
+  const sa2Areas = getSA2Areas();
+  const areaNames = sa2Areas.map(area => area.name);
+  
+  try {
+    // Save product to database
+
+    console.log(sessionData.customerID)
+    const response = await fetch('/api/create_product', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        customer_id: sessionData.customerID,
+        product_name: sessionData.productName,
+        product_desc: sessionData.productDescription,
+        target_industry: sessionData.targetIndustry,
+        selected_areas: areaNames
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to create product');
+    }
+
+    const result = await response.json();
+    console.log('Product saved to database:', result);
+    
+    // Store product ID for later use
+    sessionData.productId = result.product_id;
+    
+  } catch (error) {
+    console.error('Error saving to database:', error);
+    alert(`Error: ${error.message}`);
+    return; // Don't continue if database save failed
+  }
     
     updateAreas(areaNames);
     navigate('/processing');
