@@ -64,7 +64,6 @@ def create_business_registrar_table(server_creds: List[str]):
         Business_Name NVARCHAR(255) NOT NULL,
         Opted_Out BIT DEFAULT 0,
         Currently_Contacting BIT DEFAULT 0,
-        Status NVARCHAR(50) NULL
     );
     """)
     
@@ -80,23 +79,24 @@ def create_leads_table(server_creds: List[str]):
     )
     
     cursor = conn.cursor()
-    
-    # Create table
-    cursor.execute("""
-    CREATE TABLE Leads (
-        Lead_ID INT IDENTITY(1,1) PRIMARY KEY,
-        Product_Id INT NOT NULL,
+    cursor.execute(
+    """
+    CREATE TABLE dbo.Leads (
+        Lead_ID INT IDENTITY(1,1) PRIMARY KEY, -- Auto-increment PK
+        Customer_ID INT NOT NULL,              -- FK to Customer_Registration
+        Product_Id INT NOT NULL,               -- FK to Product_Registration
         Contact_Email NVARCHAR(255) NOT NULL,
         Business_Name NVARCHAR(255) NOT NULL,
         Business_Description NVARCHAR(MAX) NULL,
         Personalised_Statement NVARCHAR(MAX) NULL,
-        Date_Found DATE NULL,
+        Date_Found DATETIME NOT NULL DEFAULT GETDATE(),
         Status NVARCHAR(50) NULL,
-        Last_Contact_Date DATE NULL,
-        FOREIGN KEY (Product_Id) REFERENCES Product_Registration(Product_ID),
-        FOREIGN KEY (Contact_Email) REFERENCES Business_Registrar(Contact_Email)
+        Last_Contact_Date DATETIME NULL,
+        FOREIGN KEY (Customer_ID) REFERENCES Customer_Registration(Customer_ID),
+        FOREIGN KEY (Product_Id) REFERENCES Product_Registration(Product_ID)
     );
     """)
+
     
     conn.commit()
     print("Leads table created successfully")
@@ -109,9 +109,9 @@ def create_all_tables(server_creds: List[str]):
     Creates all tables in the correct order to respect foreign key constraints.
     """
     try:
-        create_customer_registration_table(server_creds)
-        create_product_registration_table(server_creds)
-        create_business_registrar_table(server_creds)
+        #create_customer_registration_table(server_creds)
+        #create_product_registration_table(server_creds)
+        #create_business_registrar_table(server_creds)
         create_leads_table(server_creds)
         print("All tables created successfully!")
     except Exception as e:

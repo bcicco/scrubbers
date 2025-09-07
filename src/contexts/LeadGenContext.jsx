@@ -9,6 +9,7 @@ export const LeadGenProvider = ({ children }) => {
     productName: '',
     productDescription: '',
     targetIndustry: '',
+    ethos: '',
     selectedAreas: [],
     leadResults: {},
     isProcessing: false,
@@ -16,13 +17,14 @@ export const LeadGenProvider = ({ children }) => {
     currentArea: ''
   });
 
-  const updateProduct = (customerID, name, description ,industry) => {
+  const updateProduct = (customerID, name, description,industry, ethos) => {
     setSessionData(prev => ({
       ...prev,
       customerID: customerID, 
       productName: name,
       productDescription: description,
       targetIndustry: industry,
+      ethos: ethos,
       currentStep: 2
     }));
   };
@@ -32,13 +34,6 @@ export const LeadGenProvider = ({ children }) => {
       ...prev,
       selectedAreas: areas,
       currentStep: 3
-    }));
-  };
-
-  const updateCustomerID = (customerID) => {
-    setSessionData(prev => ({
-      ...prev,
-      customerID: customerID
     }));
   };
 

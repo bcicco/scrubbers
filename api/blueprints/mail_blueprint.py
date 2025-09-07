@@ -114,7 +114,7 @@ for num in mail_ids:
         fwd_msg = MIMEText(body)
         fwd_msg["Subject"] = "FWD: " + (msg["Subject"] or "")
         fwd_msg["From"] = EMAIL_ACCOUNT
-        fwd_msg["To"] = "percevalrandall@gmail.com"   # 👈 replace with your real personal address
+        fwd_msg["To"] = "percevalrandall@gmail.com"  
 
         # Send it via Gmail SMTP
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:

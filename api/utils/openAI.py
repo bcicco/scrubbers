@@ -23,10 +23,8 @@ class OpenAIClient:
             completion_tokens = usage.completion_tokens
             total_tokens = usage.total_tokens
             '''
-            print(response.usage)
-            print(type(response.usage))
-            print(response.usage.input_tokens)
-            print(response.usage.output_tokens)
+            print(str(response.output_parsed).encode("utf-8", "replace").decode("utf-8"))
+
 
            
             token_details = {
@@ -34,6 +32,7 @@ class OpenAIClient:
                 "completion_tokens": 12,
                 "total_tokens": 12
             }
+
             return response.output_parsed, token_details
         except Exception as e:
             print(f"OpenAI Responses API request failed: {e}")
@@ -44,17 +43,29 @@ class OpenAIClient:
         product: str,
         product_description: str,
         target_industry: str,
-        location: str = "",
-        business_size: str = "small to medium",
-        num_businesses: int = 10
+        location: str,
+        ethos: str
+
     ) -> Businesses:
 
-        location_filter = f"must have a shop in {location}" if location else ""
 
         prompt = f"""
-Find as many emails as possible emails of businesses that are not purely online, {location_filter} in the {target_industry} industry 
-that would likely be interested in purchasing {product} from me. Ideally they will not already stock my product.
-Here is a description of {product}: {product_description}
+
+You are an API that responds in JSON format capable of finding the contact email of businesses according to a set of criteria so I can contact them about my new product. Below is the criteria you must adhere to:
+    1. The businesses must have a real place of business (i.e not purely online) in {location}, Australia.
+    2. The businesses must be in the {target_industry} industry.
+    3. The businesses must be a good fit for my new product: {product}. Here is a description so you can understand my product better: {product_description}.
+    4. Ideally, the businesses you find will not already stock my product. 
+
+Remember, you are primarily tasked with finding the email addresses of these businesses, however, I will ask you to return the following fields for each business: 
+    - Name: The name of the business 
+    - Industry: The industry the business belongs to
+    - Contact Email: The contact email of the business, your primary objective
+    - Location: The town or suburb where the business is located
+    - Description: A 2 - 3 sentence describing key features of the business
+    - Size: An estimate of the number of employees of the business
+    - Website: The website from which you sourced the contact email
+    - Personalised statement: A personalised statement written in first person alligning the identified businesses ethos with my companies ethos. This must be tailored to the identified businesses values, no assumptions. Here is a description of my ethos to assist you: {ethos}
 
 
 
