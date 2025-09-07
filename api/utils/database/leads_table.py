@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 def insert_leads(
-    businesses: Businesses, target_area, server_creds: List[str], product_id
+    businesses: Businesses, target_area, server_creds: List[str], product_id, customer_id
 ):
 
     conn = pyodbc.connect(
@@ -39,16 +39,17 @@ def insert_leads(
                 cursor.execute(
                     """
                     INSERT INTO Leads 
-                    (Product_Id, Contact_Email, Business_Name, Business_Description, Personalised_Statement, Date_Found, Status, Last_Contact_Date)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    (Customer_ID, Product_Id, Contact_Email, Business_Name, Business_Description, Personalised_Statement, Date_Found, Status, Last_Contact_Date)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                     (
+                        customer_id,
                         product_id,
                         biz.contact_email,
                         biz.name,
                         getattr(biz, "description", None),
-                        f"Lead for {getattr(biz, 'industry', 'Unknown')} business in {target_area}",  # Personalised_Statement placeholder, will update in future.
-                        current_date,  # Date_Found
+                        biz.personalised_statement,
+                        "2025-01-01", #will fix
                         "New",  # Status
                         None,  # Last_Contact_Date (NULL for new leads)
                     ),

@@ -40,6 +40,7 @@ def get_business_leads_openai(req: func.HttpRequest) -> func.HttpResponse:
         product_description = req.params.get("product_description")
         target_industry = req.params.get("target_industry")
         product_id = req.params.get("product_id")
+        ethos = req.params.get("ethos")
         # debuggin --> checks for missing params, probably a better way to do this
         missing = []
         if not locality:
@@ -62,10 +63,10 @@ def get_business_leads_openai(req: func.HttpRequest) -> func.HttpResponse:
 
         # Get leads
         businesses, token_details = openai_client.find_businesses(
-            product, product_description, target_industry, locality
+            product, product_description, target_industry, locality, ethos
         )
         
-        insert_leads(businesses, locality, server_creds, product_id)
+        insert_leads(businesses, locality, server_creds, product_id, customer_id)
         return func.HttpResponse(
             "Open AI business leads obtained + pushed successfully",
             status_code=200,

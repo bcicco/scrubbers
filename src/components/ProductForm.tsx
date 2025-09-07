@@ -10,13 +10,14 @@ const ProductForm = () => {
   const [industry, setIndustry] = useState(sessionData.targetIndustry);
   const [productName, setProductName] = useState(sessionData.productName);
   const [customerID, setCustomerID] = useState(sessionData.customerID);
+  const [ethos, setEthos] = useState(sessionData.ethos)
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
     // Check if all required fields are filled, including customerID
-    if (productDesc.trim() && industry.trim() && productName.trim() && customerID.trim()) {
-      updateProduct(customerID, productName, productDesc, industry);
+    if (productDesc.trim() && industry.trim() && productName.trim() && customerID.trim() && ethos.trim()) {
+      updateProduct(customerID, productName, productDesc, industry, ethos);
       navigate('/select-areas');
     } else {
       alert('Please fill in all required fields');
@@ -59,6 +60,18 @@ const ProductForm = () => {
             value={customerID}
             onChange={(e) => setCustomerID(e.target.value)}
             placeholder="Enter customer ID"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="ethos">Ethos:</label>
+          <input
+            id="ethos"
+            type="text"
+            value={ethos}
+            onChange={(e) => setEthos(e.target.value)}
+            placeholder="Enter ethos"
             required
           />
         </div>

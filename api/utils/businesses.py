@@ -10,6 +10,7 @@ class Business(BaseModel):
     description: Optional[str] = None
     size: Optional[str] = None
     website: Optional[str] = None
+    personalised_statement: Optional[str] = None
 
     
 class Businesses(BaseModel):

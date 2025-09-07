@@ -38,10 +38,12 @@ const LeadGeneration = () => {
             product_description: sessionData.productDescription,
             customer_id: sessionData.customerID,
             target_industry: sessionData.targetIndustry,
-            product_id: sessionData.productId
+            product_id: sessionData.productId,
+            ethos: sessionData.ethos
           })}`;
 
           const response = await fetch(url);
+          console.log(response)
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
           // save results (assuming you need them later)
