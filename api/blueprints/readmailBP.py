@@ -12,7 +12,7 @@ import imaplib  # Lets Python talk to IMAP servers using the protocol
 import email    # Allows the emails to be read
 import json
 
-IMAP_SERVER = "mail.privateemail.com"  # Connect to Gmail's IMAP server
+IMAP_SERVER = "mail.privateemail.com"  # Connect to IMAP server
 EMAIL_ACCOUNT = "percy@randallstore.com.au"
 PASSWORD = "Passw0rd1"  
 
@@ -74,7 +74,7 @@ def read_new_mail(myTimer: func.TimerRequest) -> None:
             fwd_msg["From"] = EMAIL_ACCOUNT
             fwd_msg["To"] = "percevalrandall@gmail.com"  
             # Send it via Gmail SMTP
-            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            with smtplib.SMTP_SSL(smtp, 465) as smtp:
                 smtp.login(EMAIL_ACCOUNT, PASSWORD)
                 smtp.send_message(fwd_msg)
         mail.store(num, '+FLAGS', '\\Seen')
