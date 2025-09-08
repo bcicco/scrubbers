@@ -24,7 +24,7 @@ def get_body(msg):
                 return part.get_payload(decode=True).decode(errors="ignore")
     else:
         return msg.get_payload(decode=True).decode(errors="ignore")
-
+'''
 @readmailBP.timer_trigger(schedule="0 */5 * * * *", arg_name="myTimer", run_on_startup=True,
               use_monitor=False) 
 def read_new_mail(myTimer: func.TimerRequest) -> None:
@@ -72,3 +72,4 @@ def read_new_mail(myTimer: func.TimerRequest) -> None:
                 smtp.login(EMAIL_ACCOUNT, APP_PASSWORD)
                 smtp.send_message(fwd_msg)
         mail.store(num, '+FLAGS', '\\Seen')
+'''

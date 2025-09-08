@@ -39,8 +39,8 @@ def insert_leads(
                 cursor.execute(
                     """
                     INSERT INTO Leads 
-                    (Customer_ID, Product_Id, Contact_Email, Business_Name, Business_Description, Personalised_Statement, Date_Found, Status, Last_Contact_Date)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    (Customer_ID, Product_Id, Contact_Email, Business_Name, Business_Description, Personalised_Statement, Review, Date_Found, Status, Last_Contact_Date)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                     (
                         customer_id,
@@ -49,7 +49,8 @@ def insert_leads(
                         biz.name,
                         getattr(biz, "description", None),
                         biz.personalised_statement,
-                        "2025-01-01", #will fix
+                        biz.review,
+                        current_date, 
                         "New",  # Status
                         None,  # Last_Contact_Date (NULL for new leads)
                     ),

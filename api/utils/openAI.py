@@ -23,7 +23,6 @@ class OpenAIClient:
             completion_tokens = usage.completion_tokens
             total_tokens = usage.total_tokens
             '''
-            print(str(response.output_parsed).encode("utf-8", "replace").decode("utf-8"))
 
 
            
@@ -65,8 +64,8 @@ Remember, you are primarily tasked with finding the email addresses of these bus
     - Description: A 2 - 3 sentence describing key features of the business
     - Size: An estimate of the number of employees of the business
     - Website: The website from which you sourced the contact email
-    - Personalised statement: A personalised statement written in first person alligning the identified businesses ethos with my companies ethos. This must be tailored to the identified businesses values, no assumptions. Here is a description of my ethos to assist you: {ethos}
-
+    - Personalised statement: A personalised statement written in first person as if you are me, the owner of {product} that I am trying to sell. Beginning with 'I believe', skipping an introduction as I have this covered. The statement should allign the identified businesses ethos with my companies ethos. This must be tailored to the identified businesses values, no assumptions. Here is a description of my ethos to assist you: {ethos}
+    - Review: An outstanding review from a customer of the business emphasing their values.  
 
 
 Make sure to ground your info using web search and only include businesses with email addresses. If you do not explicitly find the email address, fill in the email field with: Not available. Note that {location} is in Australia.
