@@ -12,9 +12,9 @@ import imaplib  # Lets Python talk to IMAP servers using the protocol
 import email    # Allows the emails to be read
 import json
 
-IMAP_SERVER = "imap.gmail.com"  # Connect to Gmail's IMAP server
-EMAIL_ACCOUNT = "percy@randallsstore.com.au"
-APP_PASSWORD = "tfaf libd uqws rtwv"  # 16-char app password, not your normal password
+IMAP_SERVER = "mail.privateemail.com"  # Connect to Gmail's IMAP server
+EMAIL_ACCOUNT = "percy@randallstore.com.au"
+PASSWORD = "Passw0rd1"  
 
 readmailBP = func.Blueprint()
 def get_body(msg):
@@ -24,15 +24,15 @@ def get_body(msg):
                 return part.get_payload(decode=True).decode(errors="ignore")
     else:
         return msg.get_payload(decode=True).decode(errors="ignore")
-'''
-@readmailBP.timer_trigger(schedule="0 */5 * * * *", arg_name="myTimer", run_on_startup=True,
+
+@readmailBP.timer_trigger(schedule="0 */1 * * * *", arg_name="myTimer", run_on_startup=True,
               use_monitor=False) 
 def read_new_mail(myTimer: func.TimerRequest) -> None:
     # Gmail IMAP server details
 
 
     mail = imaplib.IMAP4_SSL(IMAP_SERVER)
-    mail.login(EMAIL_ACCOUNT, APP_PASSWORD)
+    mail.login(EMAIL_ACCOUNT, PASSWORD)
 
     mail.select("inbox")
 
@@ -54,10 +54,16 @@ def read_new_mail(myTimer: func.TimerRequest) -> None:
         print("Body:", body)
 
         # Check for STOP keyword
-        if "STOP" in body.upper():
+        if body.upper() == "STOP":
             print("Found STOP — add to Global Do Not Mail list")
-
-            #CODE to actually do this needs to be added. 
+            fwd_msg = MIMEText(body)
+            fwd_msg["Subject"] = "STOP FOUND GOOD SIR (NOT A MINORITY)" 
+            fwd_msg["From"] = EMAIL_ACCOUNT
+            fwd_msg["To"] = "perceval.randall@randallstore.com.au"  
+            # Send it via Gmail SMTP
+            with smtplib.SMTP_SSL("mail.privateemail.com", 465) as smtp:
+                smtp.login(EMAIL_ACCOUNT, PASSWORD)
+                smtp.send_message(fwd_msg)
 
         else:
             print("Forwarding email to personal inbox...")
@@ -69,7 +75,6 @@ def read_new_mail(myTimer: func.TimerRequest) -> None:
             fwd_msg["To"] = "percevalrandall@gmail.com"  
             # Send it via Gmail SMTP
             with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-                smtp.login(EMAIL_ACCOUNT, APP_PASSWORD)
+                smtp.login(EMAIL_ACCOUNT, PASSWORD)
                 smtp.send_message(fwd_msg)
         mail.store(num, '+FLAGS', '\\Seen')
-'''
