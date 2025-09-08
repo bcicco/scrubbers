@@ -11,11 +11,12 @@ from email.mime.text import MIMEText
 import imaplib  # Lets Python talk to IMAP servers using the protocol
 import email    # Allows the emails to be read
 import json
-SMTP_SERVER = "smtp.gmail.com"
+SMTP_SERVER = "mail.privateemail.com"  
 IMAP_SERVER = "mail.privateemail.com"  
 IMAP_PORT = 993
+SMTP_PORT = 465
 EMAIL_ACCOUNT = "percy@randallstore.com.au"
-PASSWORD = "tfaf libd uqws rtwv"  # 16-char app password, not your normal password
+PASSWORD = "Passw0rd1"  # 16-char app password, not your normal password
 
 readmailBP = func.Blueprint()
 def get_body(msg):
@@ -26,7 +27,7 @@ def get_body(msg):
     else:
         return msg.get_payload(decode=True).decode(errors="ignore")
 
-@readmailBP.timer_trigger(schedule="0 */1 * * * *", arg_name="myTimer", run_on_startup=True,
+@readmailBP.timer_trigger(schedule="0 */5 * * * *", arg_name="myTimer", run_on_startup=True,
               use_monitor=False) 
 def read_new_mail(myTimer: func.TimerRequest) -> None:
     # Gmail IMAP server details
@@ -60,7 +61,7 @@ def read_new_mail(myTimer: func.TimerRequest) -> None:
             fwd_msg = MIMEText(body)
             fwd_msg["Subject"] = "STOP FOUND GOOD SIR (NOT A MINORITY)" 
             fwd_msg["From"] = EMAIL_ACCOUNT
-            fwd_msg["To"] = "perceval.randall@randallstore.com.au"  
+            fwd_msg["To"] = "perceval.randall@gmail.com"  
             # Send it via Gmail SMTP
             with smtplib.SMTP_SSL(SMTP_SERVER, 465) as smtp:
                 smtp.login(EMAIL_ACCOUNT, PASSWORD)
