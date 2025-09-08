@@ -72,7 +72,7 @@ def read_new_mail(myTimer: func.TimerRequest) -> None:
             fwd_msg = MIMEText(body)
             fwd_msg["Subject"] = "FWD: " + (msg["Subject"] or "")
             fwd_msg["From"] = EMAIL_ACCOUNT
-            fwd_msg["To"] = "percevalrandall@gmail.com"  
+            fwd_msg["To"] = "perceval.randall@randallstore.com.au"  
             # Send it via Gmail SMTP
             with smtplib.SMTP_SSL(smtp, 465) as smtp:
                 smtp.login(EMAIL_ACCOUNT, PASSWORD)
