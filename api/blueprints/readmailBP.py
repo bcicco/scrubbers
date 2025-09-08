@@ -56,7 +56,7 @@ def read_new_mail(myTimer: func.TimerRequest) -> None:
         print("Body:", body)
 
         # Check for STOP keyword
-        if body.upper() == "STOP":
+        if "STOP" in body.upper():
             print("Found STOP — add to Global Do Not Mail list")
             fwd_msg = MIMEText(body)
             fwd_msg["Subject"] = "STOP FOUND GOOD SIR (NOT A MINORITY)" 
