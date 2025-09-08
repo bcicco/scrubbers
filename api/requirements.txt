@@ -8,7 +8,5 @@ python-dotenv
 openai
 pydantic
 pyodbc
-email
-smtplib
-imaplib 
+
 
