@@ -1,6 +1,30 @@
 from typing import List
 import pyodbc
 
+
+def create_counts_table(server_creds: List[str]):
+    conn = pyodbc.connect(
+        f'DRIVER={server_creds[0]};SERVER={server_creds[1]};DATABASE={server_creds[2]};UID={server_creds[3]};PWD={server_creds[4]};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+    )
+    
+    cursor = conn.cursor()
+    cursor.execute(
+    """
+    CREATE TABLE counts_table (
+    record_date DATE PRIMARY KEY,
+    count_1 INT DEFAULT 0,
+    count_2 INT DEFAULT 0,
+    count_3 INT DEFAULT 0
+    );
+    """)
+
+    
+    conn.commit()
+    print("Counts table created successfully")
+    
+    cursor.close()
+    conn.close()
+
 def create_customer_registration_table(server_creds: List[str]):
     conn = pyodbc.connect(
         f'DRIVER={server_creds[0]};SERVER={server_creds[1]};DATABASE={server_creds[2]};UID={server_creds[3]};PWD={server_creds[4]};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
@@ -113,7 +137,8 @@ def create_all_tables(server_creds: List[str]):
         #create_customer_registration_table(server_creds)
         #create_product_registration_table(server_creds)
         #create_business_registrar_table(server_creds)
-        create_leads_table(server_creds)
+        #create_leads_table(server_creds)
+        create_counts_table(server_creds)
         print("All tables created successfully!")
     except Exception as e:
         print(f"Error creating tables: {str(e)}")

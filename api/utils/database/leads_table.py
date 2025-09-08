@@ -40,7 +40,7 @@ def insert_leads(
                     """
                     INSERT INTO Leads 
                     (Customer_ID, Product_Id, Contact_Email, Business_Name, Business_Description, Personalised_Statement, Review, Date_Found, Status, Last_Contact_Date)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                     (
                         customer_id,
