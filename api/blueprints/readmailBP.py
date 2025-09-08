@@ -12,8 +12,9 @@ import imaplib  # Lets Python talk to IMAP servers using the protocol
 import email    # Allows the emails to be read
 import json
 SMTP_SERVER = "smtp.gmail.com"
-IMAP_SERVER = "imap.gmail.com"  # Connect to Gmail's IMAP server
-EMAIL_ACCOUNT = "percy@randallsstore.com.au"
+IMAP_SERVER = "mail.privateemail.com"  
+IMAP_PORT = 993
+EMAIL_ACCOUNT = "percy@randallstore.com.au"
 PASSWORD = "tfaf libd uqws rtwv"  # 16-char app password, not your normal password
 
 readmailBP = func.Blueprint()
