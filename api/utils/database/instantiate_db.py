@@ -89,6 +89,7 @@ def create_leads_table(server_creds: List[str]):
         Business_Name NVARCHAR(255) NOT NULL,
         Business_Description NVARCHAR(MAX) NULL,
         Personalised_Statement NVARCHAR(MAX) NULL,
+        Review NVARCHAR(MAX) NULL,
         Date_Found DATETIME NOT NULL DEFAULT GETDATE(),
         Status NVARCHAR(50) NULL,
         Last_Contact_Date DATETIME NULL,
