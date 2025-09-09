@@ -53,10 +53,8 @@ def opt_out_business(server_creds, email):
         """
     UPDATE Business_Registrar
     SET Opted_Out = 1
-    WHERE Contact_Email = ?;
-""",
-        (email),
-    )
+    WHERE Contact_Email = '{email}'
+    """)
     conn.commit()
     cursor.close()
     conn.close()
