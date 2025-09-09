@@ -6,6 +6,7 @@ import imaplib
 import email    
 from utils.database.business_register import opt_out_business, email_exists
 from utils.database.leads_table import complete_lead, unfinished_lead_exists
+import re
 SMTP_SERVER = "mail.privateemail.com"  
 IMAP_SERVER = "mail.privateemail.com"  
 SMTP_PORT = 465
@@ -18,6 +19,9 @@ server_creds = [
     "bcicco",
     "Chinaroll1!",
 ]
+
+
+    
 readmailBP = func.Blueprint()
 def get_body(msg):
     if msg.is_multipart():
@@ -27,7 +31,7 @@ def get_body(msg):
     else:
         return msg.get_payload(decode=True).decode(errors="ignore")
 
-@readmailBP.timer_trigger(schedule="0 */50 * * * *", arg_name="myTimer", run_on_startup=False,
+@readmailBP.timer_trigger(schedule="0 */1 * * * *", arg_name="myTimer", run_on_startup=False,
               use_monitor=False) 
 def read_new_mail(myTimer: func.TimerRequest) -> None:
     # Gmail IMAP server details
