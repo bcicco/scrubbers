@@ -58,6 +58,9 @@ def read_new_mail(myTimer: func.TimerRequest) -> None:
         # Check for STOP keyword
         if "STOP" in body.upper():
             opt_out_business(server_creds, msg["From"])
+            if(email_exists(server_creds, msg["From"])):
+                if(unfinished_lead_exists):
+                    complete_lead(server_creds, msg["From"])
 
         else:
             if(email_exists(server_creds, msg["From"])):

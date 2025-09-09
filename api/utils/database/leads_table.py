@@ -105,7 +105,7 @@ def unfinished_lead_exists(server_creds, email: str) -> bool:
     cursor.execute("""
         SELECT 1
         FROM Leads
-        WHERE Contact_Email = '{email}' 
+        WHERE Contact_Email = 'bcicco.solutions@outlook.com' 
         AND (Status <> 'complete' OR Status IS NULL)
     """)
     result = cursor.fetchone()
