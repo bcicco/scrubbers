@@ -86,7 +86,7 @@ def complete_lead(server_creds, email):
     cursor = conn.cursor()
     cursor.execute(f"""
     UPDATE Leads
-    SET Status = complete
+    SET Status = 'complete'
     WHERE Contact_Email = '{email}' AND Status <> 'complete'
 """)
     
