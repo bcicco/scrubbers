@@ -84,14 +84,15 @@ def complete_lead(server_creds, email):
     )
     
     cursor = conn.cursor()
-    cursor.execute("""
+    cursor.execute(f"""
     UPDATE Leads
     SET Status = 'complete'
-    WHERE Contact_Email = ? 
+    WHERE Contact_Email = '{email}' 
     AND (Status <> 'complete' OR Status IS NULL)
-    """, email)
+""")
     
     conn.commit()
+
     
     cursor.close()
     conn.close()
@@ -104,10 +105,81 @@ def unfinished_lead_exists(server_creds, email: str) -> bool:
     cursor.execute("""
         SELECT 1
         FROM Leads
-        WHERE Contact_Email = ?
+        WHERE Contact_Email = 'bcicco.solutions@outlook.com' 
         AND (Status <> 'complete' OR Status IS NULL)
-    """, email)
+    """)
     result = cursor.fetchone()
     cursor.close()
-    conn.close()
     return result is not None
+
+def email_exists(server_creds, email: str) -> bool:
+    conn = pyodbc.connect(
+        f"DRIVER={server_creds[0]};SERVER={server_creds[1]};DATABASE={server_creds[2]};UID={server_creds[3]};PWD={server_creds[4]};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    )
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT 1
+        FROM Business_Registrar
+        WHERE Contact_Email = '{email}';
+    """)
+    result = cursor.fetchone()
+    cursor.close()
+    return result is not None
+
+
+if __name__ == '__main__':
+    mail = imaplib.IMAP4_SSL(IMAP_SERVER)
+    mail.login(EMAIL_ACCOUNT, PASSWORD)
+
+    mail.select("inbox")
+
+    # Search for unread emails
+    status, data = mail.search(None, "UNSEEN")
+    mail_ids = data[0].split()
+
+    # Loop through unread emails
+    for num in mail_ids:
+        status, data = mail.fetch(num, "(RFC822)")
+        raw_email = data[0][1]
+        msg = email.message_from_bytes(raw_email)
+
+        # Extract the body
+        body = get_body(msg)
+
+        print("From:", msg["From"])
+        print("Subject:", msg["Subject"])
+        print("Body:", body)
+
+        # Check for STOP keyword
+        if "STOP" in body.upper():
+            opt_out_business(server_creds, msg["From"])
+            if(email_exists(server_creds, msg["From"])):
+                if(unfinished_lead_exists):
+                    complete_lead(server_creds, msg["From"])
+
+        else:
+            if(email_exists(server_creds, msg["From"])):
+                if(unfinished_lead_exists):
+                    complete_lead(server_creds, msg["From"])
+                with smtplib.SMTP_SSL(SMTP_SERVER, 465) as smtp:
+                    fwd_msg = MIMEText(body)
+                    fwd_msg["subject"] = msg["From"]
+                    fwd_msg["From"] = EMAIL_ACCOUNT
+                    fwd_msg["To"] = "percy@randallsstore.com.au"
+                    smtp.login(EMAIL_ACCOUNT, PASSWORD)
+                    smtp.send_message(fwd_msg)
+        mail.store(num, '+FLAGS', '\\Seen')
+def opt_out_business(server_creds, email):
+    conn = pyodbc.connect(
+        f"DRIVER={server_creds[0]};SERVER={server_creds[1]};DATABASE={server_creds[2]};UID={server_creds[3]};PWD={server_creds[4]};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    )
+    cursor = conn.cursor()
+    cursor.execute(
+    """
+    UPDATE Business_Registrar
+    SET Opted_Out = 1
+    WHERE Contact_Email = '{email}'
+    """)
+    conn.commit()
+    cursor.close()
+    conn.close()
