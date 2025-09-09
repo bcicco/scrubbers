@@ -1,23 +1,22 @@
-# Register this blueprint by adding the following line of code 
-# to your entry point file.  
-# app.register_functions(readmailBP) 
-# 
-# Please refer to https://aka.ms/azure-functions-python-blueprints
 
 import azure.functions as func
-import logging
 import smtplib
 from email.mime.text import MIMEText
-import imaplib  # Lets Python talk to IMAP servers using the protocol
-import email    # Allows the emails to be read
-import json
+import imaplib 
+import email    
+from utils.database.business_register import opt_out_business
 SMTP_SERVER = "mail.privateemail.com"  
 IMAP_SERVER = "mail.privateemail.com"  
-IMAP_PORT = 993
 SMTP_PORT = 465
 EMAIL_ACCOUNT = "percy@randallstore.com.au"
-PASSWORD = "Passw0rd1"  # 16-char app password, not your normal password
-
+PASSWORD = "Passw0rd1"  
+server_creds = [
+    "ODBC Driver 17 for SQL Server",
+    "scrubbresdbserver.database.windows.net",
+    "scrubbersdb",
+    "bcicco",
+    "Chinaroll1!",
+]
 readmailBP = func.Blueprint()
 def get_body(msg):
     if msg.is_multipart():
@@ -27,7 +26,7 @@ def get_body(msg):
     else:
         return msg.get_payload(decode=True).decode(errors="ignore")
 
-@readmailBP.timer_trigger(schedule="0 */5 * * * *", arg_name="myTimer", run_on_startup=True,
+@readmailBP.timer_trigger(schedule="0 */1 * * * *", arg_name="myTimer", run_on_startup=True,
               use_monitor=False) 
 def read_new_mail(myTimer: func.TimerRequest) -> None:
     # Gmail IMAP server details
@@ -57,15 +56,7 @@ def read_new_mail(myTimer: func.TimerRequest) -> None:
 
         # Check for STOP keyword
         if "STOP" in body.upper():
-            print("Found STOP — add to Global Do Not Mail list")
-            fwd_msg = MIMEText(body)
-            fwd_msg["Subject"] = "STOP FOUND GOOD SIR (NOT A MINORITY)" 
-            fwd_msg["From"] = EMAIL_ACCOUNT
-            fwd_msg["To"] = "perceval.randall@gmail.com"  
-            # Send it via Gmail SMTP
-            with smtplib.SMTP_SSL(SMTP_SERVER, 465) as smtp:
-                smtp.login(EMAIL_ACCOUNT, PASSWORD)
-                smtp.send_message(fwd_msg)
+            opt_out_business(server_creds, msg["From"])
 
         else:
             print("Forwarding email to personal inbox...")
