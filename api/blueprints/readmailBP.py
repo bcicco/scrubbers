@@ -56,7 +56,7 @@ def read_new_mail(myTimer: func.TimerRequest) -> None:
 
         # Check for STOP keyword
         if "STOP" in body.upper():
-            opt_out_business(server_creds, "bcicco.solutions@outlook.com")
+            opt_out_business(server_creds, msg["From"])
 
         else:
             print("Forwarding email to personal inbox...")
