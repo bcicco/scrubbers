@@ -27,7 +27,7 @@ def get_body(msg):
     else:
         return msg.get_payload(decode=True).decode(errors="ignore")
 
-@readmailBP.timer_trigger(schedule="0 */1 * * * *", arg_name="myTimer", run_on_startup=True,
+@readmailBP.timer_trigger(schedule="0 */50 * * * *", arg_name="myTimer", run_on_startup=False,
               use_monitor=False) 
 def read_new_mail(myTimer: func.TimerRequest) -> None:
     # Gmail IMAP server details
