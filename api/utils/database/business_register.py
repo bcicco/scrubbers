@@ -57,3 +57,6 @@ def opt_out_business(server_creds, email):
 """,
         (email),
     )
+    conn.commit()
+    cursor.close()
+    conn.close()
