@@ -28,7 +28,7 @@ def create_leads_table(server_creds: List[str]):
     conn.close()
 
 
-def update_leads_table(server_creds, field):
+def update_count_table(server_creds, field):
     conn = pyodbc.connect(
         f'DRIVER={server_creds[0]};SERVER={server_creds[1]};DATABASE={server_creds[2]};UID={server_creds[3]};PWD={server_creds[4]};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
     )
@@ -41,7 +41,7 @@ def update_leads_table(server_creds, field):
 """, date.today())
     
     conn.commit()
-    print("Leads table created successfully")
+
     
     cursor.close()
     conn.close()

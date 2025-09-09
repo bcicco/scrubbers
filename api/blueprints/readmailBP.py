@@ -4,7 +4,8 @@ import smtplib
 from email.mime.text import MIMEText
 import imaplib 
 import email    
-from utils.database.business_register import opt_out_business
+from utils.database.business_register import opt_out_business, email_exists
+from utils.database.leads_table import complete_lead, unfinished_lead_exists
 SMTP_SERVER = "mail.privateemail.com"  
 IMAP_SERVER = "mail.privateemail.com"  
 SMTP_PORT = 465
@@ -59,15 +60,17 @@ def read_new_mail(myTimer: func.TimerRequest) -> None:
             opt_out_business(server_creds, msg["From"])
 
         else:
-            print("Forwarding email to personal inbox...")
-
-            # Build a simple forwarded message
-            fwd_msg = MIMEText(body)
-            fwd_msg["Subject"] = "FWD: " + (msg["Subject"] or "")
-            fwd_msg["From"] = EMAIL_ACCOUNT
-            fwd_msg["To"] = "perceval.randall@randallstore.com.au"  
-            # Send it via Gmail SMTP
-            with smtplib.SMTP_SSL(SMTP_SERVER, 465) as smtp:
-                smtp.login(EMAIL_ACCOUNT, PASSWORD)
-                smtp.send_message(fwd_msg)
+            if(email_exists(server_creds, msg["From"])):
+                if(unfinished_lead_exists):
+                    complete_lead(server_creds, msg["From"])
+                with smtplib.SMTP_SSL(SMTP_SERVER, 465) as smtp:
+                    fwd_msg = MIMEText(body)
+                    fwd_msg["subject"] = msg["From"]
+                    fwd_msg["From"] = EMAIL_ACCOUNT
+                    fwd_msg["To"] = "percy@randallsstore.com.au"
+                    smtp.login(EMAIL_ACCOUNT, PASSWORD)
+                    smtp.send_message(fwd_msg)
         mail.store(num, '+FLAGS', '\\Seen')
+            
+
+            

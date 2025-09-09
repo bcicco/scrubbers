@@ -77,3 +77,35 @@ def insert_leads(
     finally:
         cursor.close()
         conn.close()
+
+def complete_lead(server_creds, email):
+    conn = pyodbc.connect(
+        f'DRIVER={server_creds[0]};SERVER={server_creds[1]};DATABASE={server_creds[2]};UID={server_creds[3]};PWD={server_creds[4]};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+    )
+    
+    cursor = conn.cursor()
+    cursor.execute(f"""
+    UPDATE Leads
+    SET Status = complete
+    WHERE Contact_Email = '{email}' AND Status <> 'complete'
+""")
+    
+    conn.commit()
+
+    
+    cursor.close()
+    conn.close()
+
+def unfinished_lead_exists(server_creds, email: str) -> bool:
+    conn = pyodbc.connect(
+        f"DRIVER={server_creds[0]};SERVER={server_creds[1]};DATABASE={server_creds[2]};UID={server_creds[3]};PWD={server_creds[4]};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    )
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT 1
+        FROM Leads
+        WHERE Contact_Email = '{email}' AND Status <> 'complete'
+    """)
+    result = cursor.fetchone()
+    cursor.close()
+    return result is not None
