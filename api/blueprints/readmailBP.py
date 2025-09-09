@@ -70,13 +70,14 @@ def read_new_mail(myTimer: func.TimerRequest) -> None:
             if(email_exists(server_creds, msg["From"])):
                 if(unfinished_lead_exists):
                     complete_lead(server_creds, msg["From"])
-                with smtplib.SMTP_SSL(SMTP_SERVER, 465) as smtp:
-                    fwd_msg = MIMEText(body)
-                    fwd_msg["subject"] = msg["From"]
-                    fwd_msg["From"] = EMAIL_ACCOUNT
-                    fwd_msg["To"] = "percy@randallsstore.com.au"
-                    smtp.login(EMAIL_ACCOUNT, PASSWORD)
-                    smtp.send_message(fwd_msg)
+                else:
+                    with smtplib.SMTP_SSL(SMTP_SERVER, 465) as smtp:
+                        fwd_msg = MIMEText(body)
+                        fwd_msg["subject"] = msg["From"]
+                        fwd_msg["From"] = EMAIL_ACCOUNT
+                        fwd_msg["To"] = "percy@randallsstore.com.au"
+                        smtp.login(EMAIL_ACCOUNT, PASSWORD)
+                        smtp.send_message(fwd_msg)
         mail.store(num, '+FLAGS', '\\Seen')
             
 
