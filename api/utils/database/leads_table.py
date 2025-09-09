@@ -87,7 +87,8 @@ def complete_lead(server_creds, email):
     cursor.execute(f"""
     UPDATE Leads
     SET Status = 'complete'
-    WHERE Contact_Email = '{email}' AND Status <> 'complete'
+    WHERE Contact_Email = '{email}' 
+    AND (Status <> 'complete' OR Status IS NULL)
 """)
     
     conn.commit()
@@ -104,7 +105,8 @@ def unfinished_lead_exists(server_creds, email: str) -> bool:
     cursor.execute("""
         SELECT 1
         FROM Leads
-        WHERE Contact_Email = '{email}' AND Status <> 'complete'
+        WHERE Contact_Email = '{email}' 
+        AND (Status <> 'complete' OR Status IS NULL)
     """)
     result = cursor.fetchone()
     cursor.close()
