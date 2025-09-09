@@ -2,7 +2,7 @@ from ..businesses import Businesses
 import pyodbc
 from typing import List
 from datetime import datetime
-
+from utils.read_mail import extract_email
 
 def insert_leads(
     businesses: Businesses, target_area, server_creds: List[str], product_id, customer_id
@@ -79,6 +79,7 @@ def insert_leads(
         conn.close()
 
 def complete_lead(server_creds, email):
+    email = extract_email(email)
     conn = pyodbc.connect(
         f'DRIVER={server_creds[0]};SERVER={server_creds[1]};DATABASE={server_creds[2]};UID={server_creds[3]};PWD={server_creds[4]};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
     )
@@ -97,6 +98,7 @@ def complete_lead(server_creds, email):
     conn.close()
 
 def unfinished_lead_exists(server_creds, email: str) -> bool:
+    email = extract_email(email)
     conn = pyodbc.connect(
         f"DRIVER={server_creds[0]};SERVER={server_creds[1]};DATABASE={server_creds[2]};UID={server_creds[3]};PWD={server_creds[4]};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
     )
