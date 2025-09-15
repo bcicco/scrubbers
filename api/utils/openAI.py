@@ -97,4 +97,5 @@ Make sure to ground your info using web search and only include businesses with 
 
 
 if __name__ == '__main__':
-    print("test")
+    client = OpenAIClient("put key in here!!")
+    
