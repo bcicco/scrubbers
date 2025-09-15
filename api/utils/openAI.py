@@ -98,5 +98,5 @@ Make sure to ground your info using web search and only include businesses with 
 
 if __name__ == '__main__':
     client = OpenAIClient("put key in here!!")
-    businesses = client.find_businesses()
+    businesses, token_details = client.find_businesses()
     print(businesses)
