@@ -13,7 +13,7 @@ class Business(BaseModel):
     #size: Optional[str] = None
     website: Optional[str] = None
     personalised_statement: Optional[str] = None
-    #review: Optional[str] = None
+    review: Optional[str] = None
 
     
 class Businesses(BaseModel):
@@ -29,7 +29,7 @@ class OpenAIClient:
             response = self.client.responses.parse(
                 model="gpt-5-mini",
                 input=prompt,
-                tools=[{"type": "web_search_preview", "search_context_size": "high"}],
+                tools=[{"type": "web_search_preview", "search_context_size": "low"}],
                 text_format=Businesses
             )
             '''
@@ -79,7 +79,7 @@ Remember, you are primarily tasked with finding the email addresses of these bus
     - Description: A 2 - 3 sentence describing key features of the business
     - Website: The website from which you sourced the contact email
     - Personalised statement: A personalised statement written in first person as if you are me, the owner of {product} that I am trying to sell. Beginning with 'I believe', skipping an introduction as I have this covered. The statement should allign the identified businesses ethos with my companies ethos. This must be tailored to the identified businesses values, no assumptions. Here is a description of my ethos to assist you: {ethos}
-  
+    - Review: A verfied review of the business found online. 
 
 
 Make sure to ground your info using web search and only include businesses with email addresses. If you do not explicitly find the email address, fill in the email field with: Not available. Note that {location} is in Australia.
@@ -96,6 +96,7 @@ Make sure to ground your info using web search and only include businesses with 
 
 
 if __name__ == '__main__':
+    localities = ["Aitkenvale", "Annandale", "Belgian Gardens - Pallarenda", "Bohle Plains", "Condon - Rasmussen", "Cranbrook", "Douglas", "Garbutt - West end", "Gulliver - Currajong - Vincent", "Heatley", "Hermit Park - Rosslea", "Hyde Park - Pimlico", "Kelso", "Kirwan - East", "Kirwan - West", "Magnetic Island", "Mount Louisa", "Mundingburra", "Oonooba", "South Townsville - Railway Estate", "Townsville City", "Wulguru - Roseneath", "Burdell - Mount Low", "Deeragun - Jensen"]
     product = "Randall’s Coconut and Cellulose Sponge"
     product_description = "Randall’s Coconut and cellulose sponge is a kitchen/dish sponge. It is 100% plastic free. With the top made of abrasive but scratch free coconut fibres and a cellulose (wood pulp) sponge bottom. It is targeted for people who want: Plastic free kitchen for health reasons i.e not to get get microplastics in theirs or their families bodies. People who don’t want to contribute to polluting the environment with more plastic. People who are sick of cheap plastic and want something more premium "
     target_industry = "Health food stores, specifically businesses that sell organic or wholefood products and eco-friendly kitchen goods. Stores must sell products other than food / hospitality products. Stores with a clear eco friendly / sustanability ethos."
