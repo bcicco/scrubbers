@@ -10,5 +10,5 @@ from blueprints.readmailBP import readmailBP
 app = func.FunctionApp()
 app.register_functions(openAIBP)
 app.register_functions(databaseBP)
-app.register_functions(readmailBP)
+#app.register_functions(readmailBP)
 
