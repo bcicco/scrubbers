@@ -49,7 +49,7 @@ def insert_leads(
                         biz.name,
                         getattr(biz, "description", None),
                         biz.personalised_statement,
-                        biz.review,
+                        "nothing",
                         current_date, 
                         "New",  # Status
                         None,  # Last_Contact_Date (NULL for new leads)
