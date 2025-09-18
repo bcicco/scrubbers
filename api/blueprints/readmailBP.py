@@ -20,6 +20,8 @@ server_creds = [
     "Chinaroll1!",
 ]
 
+EMAIL_ACCOUNTS = ["percy@randallstore.com.au","percy.randall@randallstore.com.au", "perceval.randall@randallstore.com.au", "perceval@randallstore.com.au", "sales@randallstore.com.au"]
+
 
     
 readmailBP = func.Blueprint()
@@ -36,49 +38,49 @@ def get_body(msg):
 def read_new_mail(myTimer: func.TimerRequest) -> None:
     # Gmail IMAP server details
 
+    for email_acc in EMAIL_ACCOUNTS:
+        mail = imaplib.IMAP4_SSL(IMAP_SERVER)
+        mail.login(EMAIL_ACCOUNT, PASSWORD)
 
-    mail = imaplib.IMAP4_SSL(IMAP_SERVER)
-    mail.login(EMAIL_ACCOUNT, PASSWORD)
+        mail.select("inbox")
 
-    mail.select("inbox")
+        # Search for unread emails
+        status, data = mail.search(None, "UNSEEN")
+        mail_ids = data[0].split()
 
-    # Search for unread emails
-    status, data = mail.search(None, "UNSEEN")
-    mail_ids = data[0].split()
+        # Loop through unread emails
+        for num in mail_ids:
+            status, data = mail.fetch(num, "(RFC822)")
+            raw_email = data[0][1]
+            msg = email.message_from_bytes(raw_email)
 
-    # Loop through unread emails
-    for num in mail_ids:
-        status, data = mail.fetch(num, "(RFC822)")
-        raw_email = data[0][1]
-        msg = email.message_from_bytes(raw_email)
+            # Extract the body
+            body = get_body(msg)
 
-        # Extract the body
-        body = get_body(msg)
+            print("From:", msg["From"])
+            print("Subject:", msg["Subject"])
+            print("Body:", body)
 
-        print("From:", msg["From"])
-        print("Subject:", msg["Subject"])
-        print("Body:", body)
+            # Check for STOP keyword
+            if "STOP" in body.upper():
+                opt_out_business(server_creds, msg["From"])
+                if(email_exists(server_creds, msg["From"])):
+                    if(unfinished_lead_exists):
+                        complete_lead(server_creds, msg["From"])
 
-        # Check for STOP keyword
-        if "STOP" in body.upper():
-            opt_out_business(server_creds, msg["From"])
-            if(email_exists(server_creds, msg["From"])):
-                if(unfinished_lead_exists):
-                    complete_lead(server_creds, msg["From"])
-
-        else:
-            if(email_exists(server_creds, msg["From"])):
-                if(unfinished_lead_exists):
-                    complete_lead(server_creds, msg["From"])
-                else:
-                    with smtplib.SMTP_SSL(SMTP_SERVER, 465) as smtp:
-                        fwd_msg = MIMEText(body)
-                        fwd_msg["subject"] = msg["From"]
-                        fwd_msg["From"] = EMAIL_ACCOUNT
-                        fwd_msg["To"] = "percy@randallsstore.com.au"
-                        smtp.login(EMAIL_ACCOUNT, PASSWORD)
-                        smtp.send_message(fwd_msg)
-        mail.store(num, '+FLAGS', '\\Seen')
+            else:
+                if(email_exists(server_creds, msg["From"])):
+                    if(unfinished_lead_exists):
+                        complete_lead(server_creds, msg["From"])
+                    else:
+                        with smtplib.SMTP_SSL(SMTP_SERVER, 465) as smtp:
+                            fwd_msg = MIMEText(body)
+                            fwd_msg["subject"] = msg["From"]
+                            fwd_msg["From"] = email_acc
+                            fwd_msg["To"] = "percy@randallsstore.com.au"
+                            smtp.login(email_acc, PASSWORD)
+                            smtp.send_message(fwd_msg)
+            mail.store(num, '+FLAGS', '\\Seen')
             
 
             
