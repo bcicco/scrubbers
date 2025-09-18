@@ -80,4 +80,14 @@ if __name__ == "__main__":
     load_dotenv()
     openai_key = os.getenv("OPENAI_API_KEY")
     client = OpenAIClient(openai_key)
+
+    localities = ["Aitkenvale", "Annandale", "Belgian Gardens - Pallarenda", "Bohle Plains", "Condon - Rasmussen", "Cranbrook", "Douglas", "Garbutt - West end", "Gulliver - Currajong - Vincent", "Heatley", "Hermit Park - Rosslea", "Hyde Park - Pimlico", "Kelso", "Kirwan - East", "Kirwan - West", "Magnetic Island", "Mount Louisa", "Mundingburra", "Oonooba", "South Townsville - Railway Estate", "Townsville City", "Wulguru - Roseneath", "Burdell - Mount Low", "Deeragun - Jensen"]
+    product = "Randall’s Coconut and Cellulose Sponge"
+    product_description = "Randall’s Coconut and cellulose sponge is a kitchen/dish sponge. It is 100% plastic free. With the top made of abrasive but scratch free coconut fibres and a cellulose (wood pulp) sponge bottom. It is targeted for people who want: Plastic free kitchen for health reasons i.e not to get get microplastics in theirs or their families bodies. People who don’t want to contribute to polluting the environment with more plastic. People who are sick of cheap plastic and want something more premium "
+    target_industry = "Health food stores, specifically businesses that sell organic or wholefood products and eco-friendly kitchen goods. Stores must sell products other than food / hospitality products. Stores with a clear eco friendly / sustanability ethos."
+    ethos = "My business ethos: eco-friendly, Plastic free, Health conscious, Honest, Trustworthy, Environmentally friendly, Family oriented"
+    businesses, token_details = client.find_businesses(product, product_description, target_industry, "Townsville", ethos)
+    for business in businesses.business_leads:
+        print(business.name)
+    print("FINAL COUNT: ", len(businesses.business_leads))
     
