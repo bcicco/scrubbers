@@ -54,15 +54,18 @@ You are an API that responds in JSON format capable of finding the contact email
     2. The businesses must be in a specific industry. Here are some guidelines: {target_industry}
     3. The businesses must be a good fit for my new product: {product}. Here is a description so you can understand my product better: {product_description}.
     4. The businesses must not be part of a franchise or chain. 
-    5. You are expected to return an exhausitive list of businesses. Cap the maximum number of businesses at 10.
+    5. The businesses must not be permanently closed.
+    6. To prove that the business is still open, you must find their website, not a business listings site.
+    7. You are expected to return an exhausitive list of businesses. Cap the maximum number of businesses at 10.
 Remember, you are primarily tasked with finding the email addresses of these businesses, however, I will ask you to return the following fields for each business: 
     - Name: The name of the business 
     - Industry: The industry the business belongs to
     - Contact Email: The contact email of the business, your primary objective
     - Location: The town or suburb where the business is located
     - Description: A 2 - 3 sentence describing key features of the business
-    - Website: The website from which you sourced the contact email
-    - Personalised statement: A personalised statement written in first person as if you are me, the owner of {product} that I am trying to sell. Beginning with 'I believe', skipping an introduction as I have this covered. The statement should allign the identified businesses ethos with my companies ethos. This must be tailored to the identified businesses values, no assumptions. Here is a description of my ethos to assist you: {ethos}
+    - Website: The website from which you sourced the contact email, should be the businesses official website.
+    - Personalised statement: Craft an ethos match written in first person as if you are me, the owner of {product} that I am trying to sell. Maximum of three sentences. Beginning with 'I have chosen (found business name) because...', skipping an introduction as I have this covered. The statement should allign the identified businesses ethos with my companies ethos. This must be tailored to the identified businesses values, no assumptions. Do not include any extra text or citations, just the statement so I can copy and paste it straight into an email. Here is a description of my ethos to assist you: {ethos}
+    - Review: A verfied review of the business found online. 
 
 
 Make sure to ground your info using web search and only include businesses with email addresses. If you do not explicitly find the email address, fill in the email field with: Not available. Note that {location} is in Australia.
