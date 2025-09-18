@@ -13,7 +13,7 @@ class Business(BaseModel):
     #size: Optional[str] = None
     website: Optional[str] = None
     personalised_statement: Optional[str] = None
-    review: Optional[str] = None
+    #review: Optional[str] = None
 
     
 class Businesses(BaseModel):
